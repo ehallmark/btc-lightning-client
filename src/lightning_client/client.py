@@ -1,9 +1,7 @@
 # View GRPC Docs: https://github.com/lightningnetwork/lnd/blob/master/docs/grpc/python.md
-
 import codecs
-import lightning_pb2 as ln
-import lightning_pb2_grpc as lnrpc
-import router_pb2 as routerrpc, router_pb2_grpc as routerstub
+import lightning_client.lightning_pb2 as ln
+import lightning_client.lightning_pb2_grpc as lnrpc
 import grpc
 import os
 
@@ -44,8 +42,6 @@ class LightningClient(object):
         self.host = f'{rpc_host}:{rpc_port}'
         self.channel = grpc.secure_channel(self.host, combined_creds)
         self.stub = lnrpc.LightningStub(self.channel)
-        self.router_stub = routerstub.RouterStub(self.channel)
-
 
     def GetInfo(self):
         return self.stub.GetInfo(ln.GetInfoRequest())
