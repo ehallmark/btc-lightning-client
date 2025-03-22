@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lightning_client"
+version = "0.0.1"
+authors = [
+  { name="Evan Hallmark", email="ehallmark1122@gmail.com" },
+]
+description = "A Bitcoin lightning client designed for agentic workflows."
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+    "License :: OSI Approved :: MIT License",
+]
+dependencies = [
+    "grpcio-tools==1.71.0",
+    "grpcio==1.71.0",
+    "protobuf==5.29.4"
+]
+
+[project.urls]
+Homepage = "https://github.com/ehallmark/lightning_client"
+Issues = "https://github.com/ehallmark/lightning_client/issues"
