@@ -87,7 +87,7 @@ class LightningClient(object):
     def check_invoice_is_settled(self, r_hash: bytes):
         return self.stub.LookupInvoice(ln.PaymentHash(r_hash=r_hash)).settled
     
-
-
+    def get_wallet_balance(self):
+        return self.WalletBalance().confirmed_balance
 
 
