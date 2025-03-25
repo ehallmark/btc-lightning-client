@@ -4,6 +4,8 @@ import lightning_client.lightning_pb2 as ln
 import lightning_client.lightning_pb2_grpc as lnrpc
 import grpc
 import os
+from google.protobuf.json_format import MessageToJson
+
 
 # Due to updated ECDSA generated tls.cert we need to let gprc know that
 # we need to use that cipher suite otherwise there will be a handshake
@@ -68,6 +70,9 @@ class LightningClient(object):
         return self.stub.ListInvoices(ln.ListInvoiceRequest())
     
     # Helper methods
+    def get_info(self):
+        return MessageToJson(self.GetInfo())
+
     def get_pubkey(self):
         return self.GetInfo().identity_pubkey
     
@@ -78,7 +83,8 @@ class LightningClient(object):
         invoice = self.AddInvoice(amount)
         return {
             'payment_request': invoice.payment_request,
-            'r_hash_str': codecs.encode(invoice.r_hash, 'hex').decode('utf-8')
+            'r_hash_str': codecs.encode(invoice.r_hash, 'hex').decode('utf-8'),
+            'amount': amount
         }
     
     def pay_invoice(self, payment_request: str):
@@ -90,4 +96,12 @@ class LightningClient(object):
     def get_wallet_balance(self):
         return self.WalletBalance().confirmed_balance
 
+    def list_channels(self):
+        return MessageToJson(self.ListChannels())
+
+    def list_peers(self):
+        return MessageToJson(self.ListPeers())
+
+    def connect_peer(self, pubkey: str, host: str):
+        return self.ConnectPeer(pubkey, host)
 
