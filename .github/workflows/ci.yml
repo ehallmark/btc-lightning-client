@@ -22,10 +22,8 @@ jobs:
       - name: Install the project
         run: uv sync --all-extras --dev
 
-      - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-        with:
-          pattern: wheels_uv-*
-          path: wheels_uv
-          merge-multiple: true
+      - name: Build
+        run: uv build
+
       - name: Publish to PyPI
         run: uv publish -v wheels_uv/*
