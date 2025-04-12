@@ -124,7 +124,7 @@ wheels = [
 ]
 
 [[package]]
-name = "lightning-client"
+name = "lightning-client-mcp"
 version = "0.0.1"
 source = { editable = "." }
 dependencies = [
