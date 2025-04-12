@@ -1,4 +1,5 @@
 from lightning_client.client import LightningClient
+from google.protobuf.json_format import MessageToJson
 import os
 
 
@@ -8,5 +9,5 @@ charlie = LightningClient(
     macaroon_path=os.path.expanduser('~/repos/lightning-ai/dev/charlie/data/chain/bitcoin/simnet/admin.macaroon')
 )
 
-print(charlie.list_channels())
-print(charlie.list_peers())
+print(MessageToJson(charlie.ListChannels(charlie.ListChannelsRequest())))
+print(MessageToJson(charlie.ListPeers(charlie.ListPeersRequest())))

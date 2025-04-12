@@ -4,8 +4,6 @@ import lightning_client.lightning_pb2 as ln
 import lightning_client.lightning_pb2_grpc as lnrpc
 import grpc
 import os
-from google.protobuf.json_format import MessageToJson
-
 
 # Due to updated ECDSA generated tls.cert we need to let gprc know that
 # we need to use that cipher suite otherwise there will be a handshake
@@ -44,64 +42,83 @@ class LightningClient(object):
         self.host = f'{rpc_host}:{rpc_port}'
         self.channel = grpc.secure_channel(self.host, combined_creds)
         self.stub = lnrpc.LightningStub(self.channel)
-
-    def GetInfo(self):
-        return self.stub.GetInfo(ln.GetInfoRequest())
-
-    def WalletBalance(self):
-        return self.stub.WalletBalance(ln.WalletBalanceRequest())
-    
-    def ListPeers(self):
-        return self.stub.ListPeers(ln.ListPeersRequest())
-    
-    def ListChannels(self):
-        return self.stub.ListChannels(ln.ListChannelsRequest())
-    
-    def ConnectPeer(self, pubkey: str, host: str):
-        return self.stub.ConnectPeer(ln.ConnectPeerRequest(addr=ln.LightningAddress(pubkey=pubkey, host=host)))
-    
-    def AddInvoice(self, amount: int):
-        return self.stub.AddInvoice(ln.Invoice(value=amount))
-    
-    def SendPayment(self, payment_request: str):
-        return self.stub.SendPaymentSync(ln.SendRequest(payment_request=payment_request))
-
-    def ListInvoices(self):
-        return self.stub.ListInvoices(ln.ListInvoiceRequest())
-    
-    # Helper methods
-    def get_info(self):
-        return MessageToJson(self.GetInfo())
-
-    def get_pubkey(self):
-        return self.GetInfo().identity_pubkey
-    
-    def get_host(self):
-        return self.host
-    
-    def create_invoice(self, amount: int):
-        invoice = self.AddInvoice(amount)
-        return {
-            'payment_request': invoice.payment_request,
-            'r_hash_str': codecs.encode(invoice.r_hash, 'hex').decode('utf-8'),
-            'amount': amount
+        self.available_stubs = {
+            'AbandonChannel',
+            'AddInvoice',
+            'BakeMacaroon',
+            'BatchOpenChannel',
+            'ChannelAcceptor',
+            'ChannelBalance',
+            'CheckMacaroonPermissions',
+            'CloseChannel',
+            'ClosedChannels',
+            'ConnectPeer',
+            'DebugLevel',
+            'DecodePayReq',
+            'DeleteAllPayments',
+            'DeleteMacaroonID',
+            'DeletePayment',
+            'DescribeGraph',
+            'DisconnectPeer',
+            'EstimateFee',
+            'ExportAllChannelBackups',
+            'ExportChannelBackup',
+            'FeeReport',
+            'ForwardingHistory',
+            'FundingStateStep',
+            'GetChanInfo',
+            'GetDebugInfo',
+            'GetInfo',
+            'GetNetworkInfo',
+            'GetNodeInfo',
+            'GetNodeMetrics',
+            'GetRecoveryInfo',
+            'GetTransactions',
+            'ListAliases',
+            'ListChannels',
+            'ListInvoices',
+            'ListMacaroonIDs',
+            'ListPayments',
+            'ListPeers',
+            'ListPermissions',
+            'ListUnspent',
+            'LookupHtlcResolution',
+            'LookupInvoice',
+            'NewAddress',
+            'OpenChannelSync',
+            'OpenChannel',
+            'PendingChannels',
+            'QueryRoutes',
+            'RegisterRPCMiddleware',
+            'RestoreChannelBackups',
+            'SendCoins',
+            'SendCustomMessage',
+            'SendMany',
+            'SendPaymentSync',
+            'SendPayment',
+            'SendToRouteSync',
+            'SendToRoute',
+            'SignMessage',
+            'StopDaemon',
+            'SubscribeChannelBackups',
+            'SubscribeChannelEvents',
+            'SubscribeChannelGraph',
+            'SubscribeCustomMessages',
+            'SubscribeInvoices',
+            'SubscribePeerEvents',
+            'SubscribeTransactions',
+            'UpdateChannelPolicy',
+            'VerifyChanBackup',
+            'VerifyMessage',
+            'WalletBalance'
         }
-    
-    def pay_invoice(self, payment_request: str):
-        return self.SendPayment(payment_request)
-    
-    def check_invoice_is_settled(self, r_hash: bytes):
-        return self.stub.LookupInvoice(ln.PaymentHash(r_hash=r_hash)).settled
-    
-    def get_wallet_balance(self):
-        return self.WalletBalance().confirmed_balance
 
-    def list_channels(self):
-        return MessageToJson(self.ListChannels())
-
-    def list_peers(self):
-        return MessageToJson(self.ListPeers())
-
-    def connect_peer(self, pubkey: str, host: str):
-        return self.ConnectPeer(pubkey, host)
-
+    def __getattr__(self, item):
+        if item in self.available_stubs:
+            return getattr(self.stub, item)
+        elif item == 'stub':
+            return self.stub
+        elif hasattr(ln, item):
+            return getattr(ln, item)
+        else:
+            raise AttributeError(f"{item} is not a valid method of LightningClient")
