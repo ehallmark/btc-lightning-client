@@ -1,6 +1,6 @@
 [project]
 name = "lightning-client-mcp"
-version = "0.0.2"
+version = "0.0.3"
 authors = [
   { name="Evan Hallmark", email="ehallmark1122@gmail.com" },
 ]

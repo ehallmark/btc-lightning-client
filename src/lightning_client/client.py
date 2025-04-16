@@ -2,6 +2,8 @@
 import codecs
 import lightning_client.lightning_pb2 as ln
 import lightning_client.lightning_pb2_grpc as lnrpc
+import lightning_client.router_pb2 as routerrpc
+import lightning_client.router_pb2_grpc as routerstub
 import grpc
 import os
 
@@ -42,82 +44,21 @@ class LightningClient(object):
         self.host = f'{rpc_host}:{rpc_port}'
         self.channel = grpc.secure_channel(self.host, combined_creds)
         self.stub = lnrpc.LightningStub(self.channel)
-        self.available_stubs = {
-            'AbandonChannel',
-            'AddInvoice',
-            'BakeMacaroon',
-            'BatchOpenChannel',
-            'ChannelAcceptor',
-            'ChannelBalance',
-            'CheckMacaroonPermissions',
-            'CloseChannel',
-            'ClosedChannels',
-            'ConnectPeer',
-            'DebugLevel',
-            'DecodePayReq',
-            'DeleteAllPayments',
-            'DeleteMacaroonID',
-            'DeletePayment',
-            'DescribeGraph',
-            'DisconnectPeer',
-            'EstimateFee',
-            'ExportAllChannelBackups',
-            'ExportChannelBackup',
-            'FeeReport',
-            'ForwardingHistory',
-            'FundingStateStep',
-            'GetChanInfo',
-            'GetDebugInfo',
-            'GetInfo',
-            'GetNetworkInfo',
-            'GetNodeInfo',
-            'GetNodeMetrics',
-            'GetRecoveryInfo',
-            'GetTransactions',
-            'ListAliases',
-            'ListChannels',
-            'ListInvoices',
-            'ListMacaroonIDs',
-            'ListPayments',
-            'ListPeers',
-            'ListPermissions',
-            'ListUnspent',
-            'LookupHtlcResolution',
-            'LookupInvoice',
-            'NewAddress',
-            'OpenChannelSync',
-            'OpenChannel',
-            'PendingChannels',
-            'QueryRoutes',
-            'RegisterRPCMiddleware',
-            'RestoreChannelBackups',
-            'SendCoins',
-            'SendCustomMessage',
-            'SendMany',
-            'SendPaymentSync',
-            'SendPayment',
-            'SendToRouteSync',
-            'SendToRoute',
-            'SignMessage',
-            'StopDaemon',
-            'SubscribeChannelBackups',
-            'SubscribeChannelEvents',
-            'SubscribeChannelGraph',
-            'SubscribeCustomMessages',
-            'SubscribeInvoices',
-            'SubscribePeerEvents',
-            'SubscribeTransactions',
-            'UpdateChannelPolicy',
-            'VerifyChanBackup',
-            'VerifyMessage',
-            'WalletBalance'
-        }
+        self.routerstub = routerstub.RouterStub(self.channel)
 
     def __getattr__(self, item):
-        if item in self.available_stubs:
+        if hasattr(self.stub, item):
             return getattr(self.stub, item)
         elif item == 'stub':
             return self.stub
+        elif item == 'routerstub':
+            return self.routerstub
+        elif item.startswith('Router'):
+            item = item[6:]
+            if hasattr(routerrpc, item):
+                return getattr(routerrpc, item)
+            else:
+                return getattr(self.routerstub, item)
         elif hasattr(ln, item):
             return getattr(ln, item)
         else:
