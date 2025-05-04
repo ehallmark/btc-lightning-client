@@ -4,7 +4,7 @@ GitHub: https://github.com/ehallmark/btc-lightning-client
 
 ### Motivation
 
-This repository exists as a lightweight Python client to easily connect with a Lightning Network Daemon (`lnd`). This library is used by https://github.com/ehallmark/btc-lightning-tools for wrapping `lnd` in an MCP ([Model Context Protocol](https://docs.anthropic.com/en/docs/agents-and-tools/mcp)) server to be used with Agentic systems. 
+This repository exists as a lightweight Python client to easily connect with a Lightning Network Daemon (`lnd`). This library is used by https://github.com/ehallmark/btc-lightning-mcp-server for wrapping `lnd` in an MCP ([Model Context Protocol](https://docs.anthropic.com/en/docs/agents-and-tools/mcp)) server to be used with Agentic systems. 
 
 ### Prerequisites
 
